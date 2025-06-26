@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1082666813493",
+    "project_id": "silat-mastery-app",
+    "storage_bucket": "silat-mastery-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1082666813493:android:05d057a38c7fdfc240497c",
+        "android_client_info": {
+          "package_name": "com.example.silat_mastery_app_2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1082666813493-b45d6ti72k5cvahp6hnno4c18nq1o2t5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.silat_mastery_app_2",
+            "certificate_hash": "f8059fc10c7b7edb9ed1ed68913c5eed8dc83b3c"
+          }
+        },
+        {
+          "client_id": "1082666813493-u87sd3hatgt06n7jqhtn3433dj3m4vat.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5bq5XTQVx3j4tsrIJMxEyg8IG0-99_EI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1082666813493-u87sd3hatgt06n7jqhtn3433dj3m4vat.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
