@@ -1,22 +1,58 @@
 import 'dart:convert';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl =
-      "http://192.168.43.49:5000"; // alamat IP server Flask kamu
-  static const String apiKey = "rahasiakamu";
+  static const String baseUrl = "http://192.168.1.4:5000";
 
-  // Ambil daftar latihan
-  static Future<http.Response> getLatihan() async {
-    final uri = Uri.parse("$baseUrl/api/latihan");
-    return await http.get(uri, headers: {"X-API-KEY": apiKey});
+  static Future<Map<String, String>> _authHeaders() async {
+    final box = GetStorage();
+    final token = box.read('token');
+    return {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
   }
 
-  // Ambil tanggal latihan user
-  static Future<http.Response> getLatihanTanggalUser() async {
-    final uri = Uri.parse("$baseUrl/api/latihan-user-tanggal");
-    return await http.get(uri, headers: {"X-API-KEY": apiKey});
+  // --- Auth & Registrasi ---
+  static Future<void> loginWithGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      scopes: ['email', 'profile'],
+    );
+
+    try {
+      // ✅ Tambahkan ini untuk memaksa Google Sign-In tidak pakai akun lama
+      await googleSignIn.signOut();
+
+      // 🟡 Setelah itu baru mulai login lagi
+      final GoogleSignInAccount? account = await googleSignIn.signIn();
+      if (account == null) return;
+
+      final GoogleSignInAuthentication auth = await account.authentication;
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/login-google'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"idToken": auth.idToken}),
+      );
+
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && body['success'] == true) {
+        final data = body['data'];
+        final token = data['token'];
+        final user = data['user'];
+
+        final box = GetStorage();
+        await box.write('token', token);
+        await box.write('user', user);
+      } else {
+        throw Exception(body['message'] ?? "Login Google gagal");
+      }
+    } catch (e) {
+      throw Exception("Gagal login dengan Google: $e");
+    }
   }
 
   static Future<http.Response> loginUser({
@@ -27,7 +63,7 @@ class ApiService {
     return await http.post(
       url,
       headers: {"Content-Type": "application/json"},
-      body: '{"email": "$email", "password": "$password"}',
+      body: jsonEncode({"email": email, "password": password}),
     );
   }
 
@@ -40,7 +76,7 @@ class ApiService {
     return await http.post(
       url,
       headers: {"Content-Type": "application/json"},
-      body: '{"nama": "$nama", "email": "$email", "password": "$password"}',
+      body: jsonEncode({"nama": nama, "email": email, "password": password}),
     );
   }
 
@@ -65,115 +101,78 @@ class ApiService {
     );
   }
 
+  // --- Profile ---
   static Future<http.Response> updateJenisKelamin(String jenisKelamin) async {
-    final box = GetStorage();
-    final email = box.read('email');
-
-    if (email == null) {
-      throw Exception("Email tidak ditemukan di storage.");
-    }
-
     final url = Uri.parse("$baseUrl/api/update-jenis-kelamin");
-
+    final headers = await _authHeaders();
     return await http.post(
       url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email, "jenis_kelamin": jenisKelamin}),
+      headers: headers,
+      body: jsonEncode({"jenis_kelamin": jenisKelamin}),
     );
   }
 
   static Future<http.Response> updateUmur(int umur) async {
-    final box = GetStorage();
-    final email = box.read('email');
-
-    if (email == null) {
-      throw Exception("Email tidak ditemukan di storage.");
-    }
-
     final url = Uri.parse("$baseUrl/api/update-umur");
+    final headers = await _authHeaders();
     return await http.post(
       url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email, "umur": umur}),
+      headers: headers,
+      body: jsonEncode({"umur": umur}),
     );
   }
 
   static Future<http.Response> updateTinggi(int tinggi) async {
-    final box = GetStorage();
-    final email = box.read('email');
     final url = Uri.parse("$baseUrl/api/update-tinggi");
+    final headers = await _authHeaders();
     return await http.post(
       url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email, "tinggi": tinggi}),
+      headers: headers,
+      body: jsonEncode({"tinggi": tinggi}),
     );
   }
 
   static Future<http.Response> updateBerat(double berat) async {
-    final box = GetStorage();
-    final email = box.read('email');
     final url = Uri.parse("$baseUrl/api/update-berat");
+    final headers = await _authHeaders();
     return await http.post(
       url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email, "berat": berat}),
+      headers: headers,
+      body: jsonEncode({"berat": berat}),
     );
   }
 
-  static Future<http.Response> simpanRiwayat({
-    required String userId,
-    required int durasi,
-    required int kkal,
-  }) async {
-    final url = Uri.parse("$baseUrl/api/riwayat");
-    return await http.post(
-      url,
-      headers: {"Content-Type": "application/json", "X-API-KEY": apiKey},
-      body: jsonEncode({"user_id": userId, "durasi": durasi, "kkal": kkal}),
-    );
+  // --- Latihan ---
+  static Future<http.Response> getLatihan() async {
+    final url = Uri.parse("$baseUrl/api/latihan");
+    final headers = await _authHeaders();
+    return await http.get(url, headers: headers);
   }
 
-  static Future<List<Map<String, dynamic>>> getRiwayat(String userId) async {
-    final url = Uri.parse("$baseUrl/api/riwayat/$userId");
-    final response = await http.get(url, headers: {"X-API-KEY": apiKey});
+  static Future<Map<String, dynamic>?> getLatihanById(String id) async {
+    final url = Uri.parse("$baseUrl/api/latihan/$id");
+    final headers = await _authHeaders();
+    final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
-      return List<Map<String, dynamic>>.from(body['data']);
-    } else {
-      return [];
+      final json = jsonDecode(response.body);
+      return Map<String, dynamic>.from(json['latihan']);
     }
+
+    return null;
   }
 
-  static Future<List<Map<String, dynamic>>> getRiwayatBerat(
-    String email,
-  ) async {
-    final url = Uri.parse("$baseUrl/api/riwayat-berat/$email");
-    final response = await http.get(url, headers: {"X-API-KEY": apiKey});
-
-    if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
-      return List<Map<String, dynamic>>.from(body['data']);
-    } else {
-      return [];
-    }
+  static Future<http.Response> getLatihanTanggalUser() async {
+    final url = Uri.parse("$baseUrl/api/latihan-user-tanggal");
+    final headers = await _authHeaders();
+    return await http.get(url, headers: headers);
   }
 
-  static Future<List<Map<String, dynamic>>> getDaftarLatihan() async {
-    final uri = Uri.parse("$baseUrl/api/latihan");
-    final response = await http.get(uri, headers: {"X-API-KEY": apiKey});
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return List<Map<String, dynamic>>.from(data['data']);
-    } else {
-      return [];
-    }
-  }
-
+  // --- Gerakan ---
   static Future<List<Map<String, dynamic>>> getDaftarGerakan() async {
-    final uri = Uri.parse("$baseUrl/api/gerakan");
-    final response = await http.get(uri, headers: {"X-API-KEY": apiKey});
+    final url = Uri.parse("$baseUrl/api/gerakan");
+    final headers = await _authHeaders();
+    final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
@@ -183,18 +182,44 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>?> getLatihanById(String id) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/api/latihan/$id'),
-      headers: {"X-API-KEY": apiKey},
+  // --- Riwayat Latihan ---
+  static Future<http.Response> simpanRiwayat({
+    required int durasi,
+    required int kkal,
+  }) async {
+    final url = Uri.parse("$baseUrl/api/riwayat");
+    final headers = await _authHeaders();
+    return await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode({"durasi": durasi, "kkal": kkal}),
     );
+  }
+
+  static Future<List<Map<String, dynamic>>> getRiwayat() async {
+    final url = Uri.parse("$baseUrl/api/riwayat");
+    final headers = await _authHeaders();
+    final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {
-      final json = jsonDecode(response.body);
-
-      return Map<String, dynamic>.from(json['latihan']);
+      final body = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(body['data']);
+    } else {
+      return [];
     }
+  }
 
-    return null;
+  // --- Riwayat Berat ---
+  static Future<List<Map<String, dynamic>>> getRiwayatBerat() async {
+    final url = Uri.parse("$baseUrl/api/riwayat-berat");
+    final headers = await _authHeaders();
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(body['data']);
+    } else {
+      return [];
+    }
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:silat_mastery_app_2/app/services/api_service.dart';
 import 'package:silat_mastery_app_2/app/routes/app_pages.dart';
@@ -10,16 +11,18 @@ class BiodataJKController extends GetxController {
   }
 
   Future<void> simpanJenisKelamin() async {
-    if (jenisKelamin.isEmpty) {
-      Get.snackbar('Peringatan', 'Silakan pilih jenis kelamin terlebih dahulu');
-      return;
-    }
+  try {
+    final response = await ApiService.updateJenisKelamin(jenisKelamin.value);
+    final body = jsonDecode(response.body);
 
-    try {
-      await ApiService.updateJenisKelamin(jenisKelamin.value);
-      Get.offAllNamed(Routes.BIODATA_UMUR); // Ganti ke langkah berikut jika ada
-    } catch (e) {
-      Get.snackbar('Error', 'Gagal menyimpan data: $e');
+    if (body["success"] == true) {
+      Get.toNamed(Routes.BIODATA_UMUR);
+    } else {
+      Get.snackbar('Gagal', body["message"] ?? 'Gagal memperbarui data');
     }
+  } catch (e) {
+    Get.snackbar('Error', 'Terjadi kesalahan: $e');
   }
+}
+
 }
