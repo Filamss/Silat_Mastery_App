@@ -17,7 +17,7 @@ class AppGayaTombol {
     side: const BorderSide(color: AppWarna.kedua),
     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-    textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+    textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
   );
 
   /// Tombol info (misalnya untuk onboarding berikutnya)

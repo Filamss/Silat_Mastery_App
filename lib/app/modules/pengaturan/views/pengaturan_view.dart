@@ -115,6 +115,11 @@ class PengaturanView extends GetView<PengaturanController> {
               icon: Icons.share,
               title: "Berbagi dengan teman",
             ),
+            _SettingItem(
+              icon: Icons.logout,
+              title: "Keluar",
+              onTap: controller.logout,
+            ),
           ],
         ),
       ),

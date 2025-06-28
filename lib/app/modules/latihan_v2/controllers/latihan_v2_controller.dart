@@ -20,8 +20,6 @@ class LatihanV2Controller extends GetxController {
   }
 
   void loadData(Map<String, dynamic>? args) {
-    print("🔍 args masuk ke loadData: $args");
-
     if (args == null) {
       Get.snackbar('Error', 'Data tidak ditemukan');
       return;
@@ -35,9 +33,7 @@ class LatihanV2Controller extends GetxController {
       if (rawGerakan is Map) {
         final mappedGerakan = Map<String, dynamic>.from(rawGerakan);
         gerakan.assignAll(mappedGerakan);
-        print("✅ Gerakan berhasil assign: $gerakan");
       } else {
-        print("❌ Format gerakan tidak valid: $rawGerakan");
         Get.snackbar('Error', 'Data gerakan tidak valid');
         return;
       }
@@ -58,7 +54,6 @@ class LatihanV2Controller extends GetxController {
         isRunning.value = false;
       }
     } catch (e) {
-      print("❌ Error saat loadData: $e");
       Get.snackbar('Error', 'Gagal memuat data gerakan');
     }
   }
@@ -106,7 +101,7 @@ void startTimer() {
       },
     );
   } else {
-    Get.back(); // kembali ke halaman latihan awal atau selesai
+    Get.back(); 
   }
 }
 

@@ -11,14 +11,14 @@ class AppGayaTeks {
 
   static const TextStyle subJudul = TextStyle(
     fontFamily: 'Poppins',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: FontWeight.w600,
     color: AppWarna.utama,
   );
 
- static const TextStyle subJudul1 = TextStyle(
+  static const TextStyle subJudul1 = TextStyle(
     fontFamily: 'Poppins',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: FontWeight.w600,
     color: AppWarna.teks,
   );

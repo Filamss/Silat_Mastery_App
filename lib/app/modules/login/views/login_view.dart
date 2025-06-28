@@ -128,7 +128,7 @@ class LoginView extends GetView<LoginController> {
                     onTap: () => Get.toNamed('/register'),
                     child: Text(
                       "Daftar Sekarang",
-                      style: AppGayaTeks.subJudul.copyWith(color: Colors.red),
+                      style: AppGayaTeks.subJudul,
                     ),
                   ),
                 ],

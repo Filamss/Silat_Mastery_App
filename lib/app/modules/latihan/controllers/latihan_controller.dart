@@ -18,7 +18,7 @@ class LatihanController extends GetxController {
   void fetchLatihanById(String id) async {
     isLoading.value = true;
 
-    final data = await ApiService.getLatihanById(id); // 🔁 Ambil by ID
+    final data = await ApiService.getLatihanById(id); // ✅ Sudah return Map langsung
     if (data != null) {
       dataLatihan.value = data;
       daftarLatihan.value = List<Map<String, dynamic>>.from(data['gerakan'] ?? []);

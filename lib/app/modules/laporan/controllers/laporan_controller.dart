@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:silat_mastery_app_2/app/services/api_service.dart';
 
 class LaporanController extends GetxController {
@@ -22,29 +21,19 @@ class LaporanController extends GetxController {
   void onInit() {
     super.onInit();
     fetchRiwayat();
+    fetchRiwayatBerat();
   }
 
   void fetchRiwayatBerat() async {
-    final box = GetStorage();
-    final email = box.read("email");
-
-    if (email == null) return;
-
-    final data = await ApiService.getRiwayatBerat(email);
-    riwayatBerat.value = data;
+    try {
+      final data = await ApiService.getRiwayatBerat();
+      riwayatBerat.value = data;
+    } catch (_) {}
   }
 
   void fetchRiwayat() async {
-    final box = GetStorage();
-    final user = box.read("user");
-
-    if (user == null || user["_id"] == null) {
-      return;
-    }
-
-    final userId = user["_id"];
     try {
-      final data = await ApiService.getRiwayat(userId);
+      final data = await ApiService.getRiwayat();
 
       riwayat.value = List<Map<String, dynamic>>.from(data);
 
@@ -60,20 +49,14 @@ class LaporanController extends GetxController {
       totalKkal.value = totalKkalSum;
       totalMenit.value = totalDurasiSum;
 
-      // Konversi tanggal-tanggal latihan ke DateTime dan sort dari terbaru
       final tanggalList =
           riwayat.map((e) => DateTime.parse(e['tanggal']).toLocal()).toList()
             ..sort((a, b) => b.compareTo(a));
 
-      // Set untuk menyimpan tanggal-tanggal unik (tanpa jam)
       final tanggalUnik =
-          tanggalList
-              .map((d) => DateTime(d.year, d.month, d.day))
-              .toSet()
-              .toList()
+          tanggalList.map((d) => DateTime(d.year, d.month, d.day)).toSet().toList()
             ..sort((a, b) => b.compareTo(a));
 
-      // Hitung hari beruntun
       int beruntun = 0;
       DateTime today = DateTime.now();
       for (int i = 0; i < tanggalUnik.length; i++) {
@@ -86,7 +69,7 @@ class LaporanController extends GetxController {
       }
       hariBeruntun.value = beruntun;
 
-      // Hitung rekor terbaik personal
+//Hitung terbaik personal
       int bestStreak = 0;
       int currentStreak = 1;
       for (int i = 1; i < tanggalUnik.length; i++) {
@@ -102,6 +85,8 @@ class LaporanController extends GetxController {
       }
       personalBest.value =
           bestStreak > currentStreak ? bestStreak : currentStreak;
-    } catch (e) {}
+    } catch (e) {
+      // optional: print or log error
+    }
   }
 }

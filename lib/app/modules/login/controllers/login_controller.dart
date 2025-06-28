@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:silat_mastery_app_2/app/services/api_service.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
 import 'package:silat_mastery_app_2/app/routes/app_pages.dart';
 
 class LoginController extends GetxController {
@@ -73,55 +71,27 @@ class LoginController extends GetxController {
   // ✅ Login Google
   Future<void> loginWithGoogle() async {
     try {
-      final googleSignIn = GoogleSignIn(
-        scopes: ['email'],
-        serverClientId:
-            '1082666813493-b45d6ti72k5cvahp6hnno4c18nq1o2t5.apps.googleusercontent.com',
-      );
+      await ApiService.loginWithGoogle();
 
-      final googleUser = await googleSignIn.signIn();
-      if (googleUser == null) return;
+      final box = GetStorage();
+      final user = box.read("user");
 
-      final googleAuth = await googleUser.authentication;
-      final idToken = googleAuth.idToken;
-
-      if (idToken == null) {
-        Get.snackbar('Gagal', 'Tidak dapat mengambil token Google');
+      if (user == null) {
+        Get.snackbar('Gagal', 'User tidak ditemukan setelah login Google.');
         return;
       }
 
-      final response = await http.post(
-        Uri.parse("http://192.168.1.5:5000/api/login-google"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"idToken": idToken}),
-      );
+      final profileComplete = user["profile_complete"] ?? false;
 
-      final data = jsonDecode(response.body);
+      Get.snackbar('Berhasil', 'Login Google berhasil!');
 
-      if (response.statusCode == 200 && data["success"] == true) {
-        final user = data["user"];
-
-        if (user == null) {
-          Get.snackbar('Gagal', 'Data pengguna Google tidak ditemukan.');
-          return;
-        }
-
-        final profileComplete = user["profile_complete"] ?? false;
-
-        final box = GetStorage();
-        box.write("email", user["email"]);
-
-        Get.snackbar('Berhasil', 'Login Google berhasil!');
-        if (profileComplete == true) {
-          Get.offAllNamed(Routes.HOME);
-        } else {
-          Get.offAllNamed(Routes.BIODATA_JK);
-        }
+      if (profileComplete == true) {
+        Get.offAllNamed(Routes.HOME);
       } else {
-        Get.snackbar('Gagal', data["message"] ?? 'Login gagal');
+        Get.offAllNamed(Routes.BIODATA_JK);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan: $e');
+      Get.snackbar('Error', 'Gagal login dengan Google: $e');
     }
   }
 }

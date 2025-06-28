@@ -23,7 +23,7 @@ class AppPrimaryButton extends StatelessWidget {
         child: Center(
           child: Text(
             label,
-            style: AppGayaTeks.judul.copyWith(color: Colors.white),
+            style: AppGayaTeks.subJudul.copyWith(color: Colors.white),
           ),
         ),
       ),

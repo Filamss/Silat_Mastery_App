@@ -19,18 +19,14 @@ class LatihanV1Controller extends GetxController {
         final rawDaftar = args['daftarLatihan'];
         final index = args['index'] ?? 0;
         final rawGerakan = args['gerakan'];
-if (rawGerakan != null) {
-  try {
-    gerakan.assignAll(Map<String, dynamic>.from(rawGerakan));
-    print('✅ Gerakan berhasil assign: $gerakan');
-  } catch (e) {
-    print('❌ Gagal assign gerakan: $e');
-    Get.snackbar('Error', 'Data gerakan tidak valid');
-  }
-} else {
-  print('⚠️ rawGerakan null');
-}
-
+        if (rawGerakan != null) {
+          try {
+            gerakan.assignAll(Map<String, dynamic>.from(rawGerakan));
+          } catch (e) {
+            Get.snackbar('Error', 'Data gerakan tidak valid');
+          }
+        } else {
+        }
 
         if (rawDaftar is List) {
           daftarLatihan = List<Map<String, dynamic>>.from(rawDaftar);
@@ -60,11 +56,14 @@ if (rawGerakan != null) {
 
   void navigateToLatihanV2() {
     if (daftarLatihan.isNotEmpty && indexGerakan.value < daftarLatihan.length) {
-      Get.offNamed('/latihan-v2', arguments: {
-        'gerakan': daftarLatihan[indexGerakan.value],
-        'daftarLatihan': daftarLatihan,
-        'index': indexGerakan.value,
-      });
+      Get.offNamed(
+        '/latihan-v2',
+        arguments: {
+          'gerakan': daftarLatihan[indexGerakan.value],
+          'daftarLatihan': daftarLatihan,
+          'index': indexGerakan.value,
+        },
+      );
     } else {
       Get.snackbar('Oops', 'Tidak ada gerakan tersedia.');
     }
