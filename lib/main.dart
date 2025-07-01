@@ -5,12 +5,14 @@ import 'package:get_storage/get_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:silat_mastery_app_2/app/routes/app_pages.dart';
 import 'package:silat_mastery_app_2/app/widget/tema/app_tema.dart';
+import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await Firebase.initializeApp();
   await initializeDateFormatting('id_ID', null);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   final box = GetStorage();
   final token = box.read("token");
@@ -20,6 +22,8 @@ Future<void> main() async {
   if (token != null && user != null) {
     final profileComplete = user["profile_complete"] ?? false;
     initialRoute = profileComplete ? Routes.HOME : Routes.BIODATA_JK;
+    print("Token: $token");
+    print("User: $user");
   } else {
     initialRoute = Routes.LOGIN;
   }

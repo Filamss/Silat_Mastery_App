@@ -16,6 +16,8 @@ import '../modules/laporan/bindings/laporan_binding.dart';
 import '../modules/laporan/views/laporan_view.dart';
 import '../modules/latihan/bindings/latihan_binding.dart';
 import '../modules/latihan/views/latihan_view.dart';
+import '../modules/latihan_camera/bindings/latihan_camera_binding.dart';
+import '../modules/latihan_camera/views/latihan_camera_view.dart';
 import '../modules/latihan_detail/bindings/latihan_detail_binding.dart';
 import '../modules/latihan_detail/views/latihan_detail_view.dart';
 import '../modules/latihan_v1/bindings/latihan_v1_binding.dart';
@@ -124,8 +126,13 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.LATIHAN_DETAIL,
-      page: () => const LatihanDetailView(),
+      page: () => LatihanDetailView(),
       binding: LatihanDetailBinding(),
+    ),
+    GetPage(
+      name: _Paths.LATIHAN_CAMERA,
+      page: () =>  LatihanCameraView(),
+      binding: LatihanCameraBinding(),
     ),
   ];
 }

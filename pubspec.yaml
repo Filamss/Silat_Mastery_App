@@ -45,6 +45,9 @@ dependencies:
   webview_flutter: ^4.2.2
   fl_chart: ^1.0.0
   cached_network_image: ^3.3.1
+  tflite_flutter: ^0.11.0
+  camera: ^0.10.4
+  google_mlkit_pose_detection: ^0.14.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -77,6 +80,8 @@ flutter:
     - assets/img/exercise1.png
     - assets/img/pencak-silat.gif
     - assets/icons/google.png
+    - assets/model/
+    - assets/label/
 
   fonts:
     - family: Poppins
