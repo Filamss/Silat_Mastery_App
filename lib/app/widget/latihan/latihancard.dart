@@ -11,6 +11,7 @@ class LatihanCard extends StatelessWidget {
   final int? repetisi;
   final int? durasi;
   final int index;
+  final VoidCallback? onTap; 
 
   const LatihanCard({
     super.key,
@@ -19,6 +20,7 @@ class LatihanCard extends StatelessWidget {
     this.repetisi,
     this.durasi,
     required this.index,
+    this.onTap, 
   });
 
   String getImageUrl(String gambarPath) {
@@ -38,64 +40,63 @@ class LatihanCard extends StatelessWidget {
       detailText = '$durasi detik';
     }
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 8),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-      decoration: BoxDecoration(
-        color: AppWarna.latar,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: ReorderableDragStartListener(
-              index: index,
-              child: Icon(Icons.drag_indicator, color: AppWarna.abu),
+    return GestureDetector( 
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        decoration: BoxDecoration(
+          color: AppWarna.latar,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              right: 16,
-            ), // jarak horizontal antar gambar dan teks
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: CachedNetworkImage(
-                imageUrl: getImageUrl(gambar),
-                width: 50,
-                height: 70,
-                fit: BoxFit.cover,
-                placeholder:
-                    (context, url) => const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                errorWidget:
-                    (context, url, error) =>
-                        const Icon(Icons.image_not_supported),
+          ],
+        ),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: ReorderableDragStartListener(
+                index: index,
+                child: Icon(Icons.drag_indicator, color: AppWarna.abu),
               ),
             ),
-          ),
-          AppSpasi.kecil,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(namaGerakan, style: AppGayaTeks.subJudul1),
-                if (detailText.isNotEmpty)
-                  Text(detailText, style: AppGayaTeks.keterangan2),
-              ],
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: CachedNetworkImage(
+                  imageUrl: getImageUrl(gambar),
+                  width: 50,
+                  height: 70,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  errorWidget: (context, url, error) =>
+                      const Icon(Icons.image_not_supported),
+                ),
+              ),
             ),
-          ),
-        ],
+            AppSpasi.kecil,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(namaGerakan, style: AppGayaTeks.subJudul1),
+                  if (detailText.isNotEmpty)
+                    Text(detailText, style: AppGayaTeks.keterangan2),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
