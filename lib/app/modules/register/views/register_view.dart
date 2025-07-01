@@ -129,10 +129,12 @@ class RegisterView extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       InkWell(
-                        onTap: () {},
-                        child: Image.asset(
-                          'assets/icons/google.png',
-                          height: 40,
+                        onTap: controller.loginWithGoogle,
+                        child: Center(
+                          child: Image.asset(
+                            'assets/icons/google.png',
+                            height: 40,
+                          ),
                         ),
                       ),
                     ],
@@ -146,10 +148,10 @@ class RegisterView extends StatelessWidget {
                 children: [
                   Text("Sudah Punya Akun ? ", style: AppGayaTeks.isi),
                   GestureDetector(
-                    onTap: () => Get.offNamed('/login'),
+                    onTap: () => Get.back(),
                     child: Text(
                       "Login",
-                      style: AppGayaTeks.subJudul.copyWith(color: Colors.red),
+                      style: AppGayaTeks.subJudul,
                     ),
                   ),
                 ],

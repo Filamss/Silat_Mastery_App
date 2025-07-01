@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:silat_mastery_app_2/app/routes/app_pages.dart';
 import 'package:silat_mastery_app_2/app/services/api_service.dart';
 
 class RegisterController extends GetxController {
@@ -48,4 +50,26 @@ class RegisterController extends GetxController {
       }
     }
   }
+  Future<void> loginWithGoogle() async {
+  try {
+    await ApiService.loginWithGoogle();
+
+    // ✅ Ambil ulang profil user dari server (yang pasti sudah lengkap)
+    final profile = await ApiService.getUserProfile();
+
+    final box = GetStorage();
+    box.write("user", profile);
+
+    final profileComplete = profile["profile_complete"] ?? false;
+
+    Get.snackbar('Berhasil', 'Login Google berhasil!');
+    if (profileComplete == true) {
+      Get.offAllNamed(Routes.HOME);
+    } else {
+      Get.offAllNamed(Routes.BIODATA_JK);
+    }
+  } catch (e) {
+    Get.snackbar('Error', 'Gagal login dengan Google: $e');
+  }
+}
 }

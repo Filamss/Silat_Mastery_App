@@ -71,26 +71,29 @@ class LoginController extends GetxController {
   // ✅ Login Google
   Future<void> loginWithGoogle() async {
     try {
+      print("🚀 MULAI loginWithGoogle()");
       await ApiService.loginWithGoogle();
+      print("✅ SELESAI loginWithGoogle(), ambil profile...");
+
+      final profile = await ApiService.getUserProfile();
+      print("📦 PROFILE DITERIMA: $profile");
 
       final box = GetStorage();
-      final user = box.read("user");
+      box.write("user", profile);
 
-      if (user == null) {
-        Get.snackbar('Gagal', 'User tidak ditemukan setelah login Google.');
-        return;
-      }
-
-      final profileComplete = user["profile_complete"] ?? false;
+      final profileComplete = profile["profile_complete"] ?? false;
+      print(profileComplete);
 
       Get.snackbar('Berhasil', 'Login Google berhasil!');
-
       if (profileComplete == true) {
+        print("➡️ Redirect ke HOME");
         Get.offAllNamed(Routes.HOME);
       } else {
+        print("➡️ Redirect ke BIODATA");
         Get.offAllNamed(Routes.BIODATA_JK);
       }
     } catch (e) {
+      print("❌ ERROR: $e");
       Get.snackbar('Error', 'Gagal login dengan Google: $e');
     }
   }
