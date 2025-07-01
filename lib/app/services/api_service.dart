@@ -4,7 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = "http://192.168.1.4:5000";
+  static const String baseUrl = "http://192.168.1.6:5000";
 
   static Future<Map<String, String>> _authHeaders() async {
     final box = GetStorage();
@@ -27,32 +27,56 @@ class ApiService {
 
       // 🟡 Setelah itu baru mulai login lagi
       final GoogleSignInAccount? account = await googleSignIn.signIn();
-      if (account == null) return;
+      if (account == null) {
+        print("❌ Google Sign-In dibatalkan oleh user");
+        return;
+      }
 
       final GoogleSignInAuthentication auth = await account.authentication;
+      print("✅ Google ID Token: ${auth.idToken}");
 
+      print("🌐 Mengirim idToken ke backend...");
       final response = await http.post(
         Uri.parse('$baseUrl/api/login-google'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"idToken": auth.idToken}),
       );
 
+      print("📥 RESPONSE STATUS: ${response.statusCode}");
+      print("📥 RESPONSE BODY: ${response.body}");
+
       final body = jsonDecode(response.body);
 
       if (response.statusCode == 200 && body['success'] == true) {
         final data = body['data'];
         final token = data['token'];
-        final user = data['user'];
 
         final box = GetStorage();
         await box.write('token', token);
-        await box.write('user', user);
+
+        // ✅ Ambil data user paling baru dari endpoint /api/profile
+        final userBaru = await ApiService.getUserProfile();
+        await box.write('user', userBaru);
       } else {
         throw Exception(body['message'] ?? "Login Google gagal");
       }
     } catch (e) {
+      print("❌ ERROR DI loginWithGoogle: $e");
       throw Exception("Gagal login dengan Google: $e");
     }
+  }
+
+  static Future<Map<String, dynamic>> getUserProfile() async {
+    final url = Uri.parse('$baseUrl/api/profile');
+    final headers = await _authHeaders();
+    final response = await http.get(url, headers: headers);
+    final body = jsonDecode(response.body);
+    print("🧪 URL: $url");
+    print("🧪 Headers: $headers");
+    print("🧪 Response: ${response.statusCode}");
+    print("🧪 Body: ${response.body}");
+
+    return body['data'];
   }
 
   static Future<http.Response> loginUser({
