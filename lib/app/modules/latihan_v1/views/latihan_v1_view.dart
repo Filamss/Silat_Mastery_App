@@ -48,8 +48,7 @@ class LatihanV1View extends GetView<LatihanV1Controller> {
                     backgroundColor: AppWarna.latar.withOpacity(0.8),
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
-                      onPressed:
-                          () => Get.back()
+                      onPressed: () => Get.back(),
                     ),
                   ),
                 ),
@@ -100,10 +99,7 @@ class LatihanV1View extends GetView<LatihanV1Controller> {
                             ),
                             Text(
                               controller.countdown.value.toString(),
-                              style: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: AppGayaTeks.judul,
                             ),
                           ],
                         ),
@@ -121,7 +117,12 @@ class LatihanV1View extends GetView<LatihanV1Controller> {
                         height: 48,
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.play_arrow),
-                          label: const Text("Mulai"),
+                          label: Text(
+                            "Mulai",
+                            style: AppGayaTeks.subJudul1.copyWith(
+                              color: Colors.white,
+                            ),
+                          ),
                           onPressed: controller.navigateToLatihanV2,
                           style: AppGayaTombol.utama,
                         ),

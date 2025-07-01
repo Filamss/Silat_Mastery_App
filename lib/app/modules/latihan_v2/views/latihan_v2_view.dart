@@ -161,15 +161,11 @@ class LatihanV2View extends GetView<LatihanV2Controller> {
                           children: [
                             controller.indexGerakan.value > 0
                                 ? TextButton.icon(
-                                  onPressed: () {
-                                    // aksi untuk kembali ke gerakan sebelumnya
-                                  },
+                                  onPressed: controller.keGerakanSebelumnya,
                                   icon: const Icon(Icons.skip_previous),
                                   label: const Text("Sebelumnya"),
                                 )
-                                : const SizedBox(
-                                  width: 120,
-                                ), // placeholder agar tetap seimbang
+                                : const SizedBox(width: 120),
 
                             TextButton.icon(
                               onPressed: controller.keGerakanSelanjutnya,

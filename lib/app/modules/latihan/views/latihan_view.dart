@@ -61,12 +61,30 @@ class LatihanView extends GetView<LatihanController> {
                 ),
                 Positioned(
                   top: 40,
-                  right: 16,
+                  right: 30,
                   child: CircleAvatar(
                     backgroundColor: AppWarna.latar.withOpacity(0.8),
                     child: IconButton(
-                      icon: const Icon(Icons.more_vert, color: Colors.black),
-                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.camera_enhance_outlined,
+                        color: Colors.black,
+                      ),
+                      onPressed: () {
+                        final latihan = controller.dataLatihan.value;
+                        if (latihan != null) {
+                          Get.toNamed(
+                            '/latihan-camera',
+                            arguments: {
+                              'nama_latihan':
+                                  controller
+                                      .dataLatihan
+                                      .value?['nama_latihan'] ??
+                                  '-',
+                              'tipe_model': controller.tipeModel.value,
+                            },
+                          );
+                        }
+                      },
                     ),
                   ),
                 ),
@@ -130,6 +148,16 @@ class LatihanView extends GetView<LatihanController> {
                                 gambar: gerakan['gambar'] ?? '',
                                 repetisi: gerakan['repetisi'],
                                 durasi: gerakan['durasi'],
+                                onTap: () {
+                                  Get.toNamed(
+                                    '/latihan-detail',
+                                    arguments: {
+                                      ...gerakan,
+                                      'index': index,
+                                      'daftarLatihan': controller.daftarLatihan,
+                                    },
+                                  );
+                                },
                               );
                             },
                           ),
@@ -155,7 +183,12 @@ class LatihanView extends GetView<LatihanController> {
                             }
                           },
                           style: AppGayaTombol.utama,
-                          child: const Text("Mulai"),
+                          child: Text(
+                            "Mulai",
+                            style: AppGayaTeks.subJudul1.copyWith(
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     ],
