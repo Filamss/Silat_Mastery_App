@@ -30,12 +30,9 @@ class AnalisisStreamlitCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Analisis Kemajuan", style: AppGayaTeks.subJudul),
+                  Text("Analisis Berita", style: AppGayaTeks.subJudul),
                   const SizedBox(height: 4),
-                  Text(
-                    "Lihat performa latihan kamu di dashboard analisis.",
-                    style: AppGayaTeks.keterangan,
-                  ),
+                  Text("Lihat Analisis Berita.", style: AppGayaTeks.keterangan),
                 ],
               ),
             ),
