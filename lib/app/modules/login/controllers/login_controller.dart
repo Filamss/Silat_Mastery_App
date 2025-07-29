@@ -47,6 +47,8 @@ class LoginController extends GetxController {
           final box = GetStorage();
           box.write("user", user); // simpan semua data user (Map)
           box.write("token", body["data"]?["token"]); // simpan token login
+          
+          await ApiService.simpanRiwayatLogin();
 
           Get.snackbar('Berhasil', 'Selamat datang kembali!');
 
@@ -71,29 +73,22 @@ class LoginController extends GetxController {
   // ✅ Login Google
   Future<void> loginWithGoogle() async {
     try {
-      print("🚀 MULAI loginWithGoogle()");
       await ApiService.loginWithGoogle();
-      print("✅ SELESAI loginWithGoogle(), ambil profile...");
 
       final profile = await ApiService.getUserProfile();
-      print("📦 PROFILE DITERIMA: $profile");
 
       final box = GetStorage();
       box.write("user", profile);
 
       final profileComplete = profile["profile_complete"] ?? false;
-      print(profileComplete);
 
       Get.snackbar('Berhasil', 'Login Google berhasil!');
       if (profileComplete == true) {
-        print("➡️ Redirect ke HOME");
         Get.offAllNamed(Routes.HOME);
       } else {
-        print("➡️ Redirect ke BIODATA");
         Get.offAllNamed(Routes.BIODATA_JK);
       }
     } catch (e) {
-      print("❌ ERROR: $e");
       Get.snackbar('Error', 'Gagal login dengan Google: $e');
     }
   }
