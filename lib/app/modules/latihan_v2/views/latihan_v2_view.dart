@@ -16,7 +16,6 @@ class LatihanV2View extends GetView<LatihanV2Controller> {
     return Scaffold(
       backgroundColor: AppWarna.latar,
       body: Obx(() {
-        print("🔥 Gerakan saat ini: ${controller.gerakan}");
 
         final gerakan = controller.gerakan;
         final nama = gerakan['nama_gerakan'] ?? '-';

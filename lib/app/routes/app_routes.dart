@@ -22,6 +22,7 @@ abstract class Routes {
   static const LATIHAN_V1 = _Paths.LATIHAN_V1;
   static const LATIHAN_DETAIL = _Paths.LATIHAN_DETAIL;
   static const LATIHAN_CAMERA = _Paths.LATIHAN_CAMERA;
+  static const ARTIKEL_DETAIL = _Paths.ARTIKEL_DETAIL;
 }
 
 abstract class _Paths {
@@ -45,4 +46,5 @@ abstract class _Paths {
   static const LATIHAN_V1 = '/latihan-v1';
   static const LATIHAN_DETAIL = '/latihan-detail';
   static const LATIHAN_CAMERA = '/latihan-camera';
+  static const ARTIKEL_DETAIL = '/artikel-detail';
 }

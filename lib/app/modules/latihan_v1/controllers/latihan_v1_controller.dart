@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 class LatihanV1Controller extends GetxController {
   final gerakan = <String, dynamic>{}.obs;
   final totalCountdown = 20;
   final countdown = 20.obs;
+
   Timer? timer;
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   final indexGerakan = 0.obs;
   List<Map<String, dynamic>> daftarLatihan = [];
@@ -25,8 +29,7 @@ class LatihanV1Controller extends GetxController {
           } catch (e) {
             Get.snackbar('Error', 'Data gerakan tidak valid');
           }
-        } else {
-        }
+        } else {}
 
         if (rawDaftar is List) {
           daftarLatihan = List<Map<String, dynamic>>.from(rawDaftar);
@@ -44,12 +47,28 @@ class LatihanV1Controller extends GetxController {
   }
 
   void startCountdown() {
-    timer = Timer.periodic(const Duration(seconds: 1), (t) {
+    timer = Timer.periodic(const Duration(seconds: 1), (t) async {
       if (countdown.value <= 1) {
         t.cancel();
-        navigateToLatihanV2();
       } else {
         countdown.value--;
+
+        if (countdown.value == 8) {
+          try {
+            await _audioPlayer.stop();
+            await _audioPlayer.play(AssetSource('sounds/HitungMundur.mp3'));
+            await _audioPlayer.onPlayerComplete.first;
+
+            await _audioPlayer.stop();
+            await _audioPlayer.play(AssetSource('sounds/Peluit.mp3'));
+            await _audioPlayer.onPlayerComplete.first;
+
+            navigateToLatihanV2();
+          } catch (e) {
+            debugPrint("❌ Gagal memutar audio: $e");
+            navigateToLatihanV2();
+          }
+        }
       }
     });
   }

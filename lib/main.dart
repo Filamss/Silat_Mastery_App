@@ -22,10 +22,8 @@ Future<void> main() async {
   if (token != null && user != null) {
     final profileComplete = user["profile_complete"] ?? false;
     initialRoute = profileComplete ? Routes.HOME : Routes.BIODATA_JK;
-    print("Token: $token");
-    print("User: $user");
   } else {
-    initialRoute = Routes.LOGIN;
+    initialRoute = Routes.SPLASH;
   }
 
   runApp(SilatMasteryApp(initialRoute: initialRoute));

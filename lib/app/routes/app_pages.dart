@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/artikel_detail/bindings/artikel_detail_binding.dart';
+import '../modules/artikel_detail/views/artikel_detail_view.dart';
 import '../modules/biodata_jk/bindings/biodata_jk_binding.dart';
 import '../modules/biodata_jk/views/biodata_jk_view.dart';
 import '../modules/biodata_tinggi_berat/bindings/biodata_tinggi_berat_binding.dart';
@@ -131,8 +133,13 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.LATIHAN_CAMERA,
-      page: () =>  LatihanCameraView(),
+      page: () => LatihanCameraView(),
       binding: LatihanCameraBinding(),
+    ),
+    GetPage(
+      name: _Paths.ARTIKEL_DETAIL,
+      page: () => const ArtikelDetailView(),
+      binding: ArtikelDetailBinding(),
     ),
   ];
 }

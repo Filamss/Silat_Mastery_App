@@ -4,7 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = "http://192.168.1.6:5000";
+  static const String baseUrl = "https://ultimate-fleet-buck.ngrok-free.app";
 
   static Future<Map<String, String>> _authHeaders() async {
     final box = GetStorage();
@@ -19,6 +19,7 @@ class ApiService {
   static Future<void> loginWithGoogle() async {
     final GoogleSignIn googleSignIn = GoogleSignIn(
       scopes: ['email', 'profile'],
+      
     );
 
     try {
@@ -28,22 +29,16 @@ class ApiService {
       // 🟡 Setelah itu baru mulai login lagi
       final GoogleSignInAccount? account = await googleSignIn.signIn();
       if (account == null) {
-        print("❌ Google Sign-In dibatalkan oleh user");
         return;
       }
 
       final GoogleSignInAuthentication auth = await account.authentication;
-      print("✅ Google ID Token: ${auth.idToken}");
 
-      print("🌐 Mengirim idToken ke backend...");
       final response = await http.post(
         Uri.parse('$baseUrl/api/login-google'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"idToken": auth.idToken}),
       );
-
-      print("📥 RESPONSE STATUS: ${response.statusCode}");
-      print("📥 RESPONSE BODY: ${response.body}");
 
       final body = jsonDecode(response.body);
 
@@ -54,14 +49,15 @@ class ApiService {
         final box = GetStorage();
         await box.write('token', token);
 
+
         // ✅ Ambil data user paling baru dari endpoint /api/profile
         final userBaru = await ApiService.getUserProfile();
         await box.write('user', userBaru);
+        await simpanRiwayatLogin(); // Tambahkan baris ini
       } else {
         throw Exception(body['message'] ?? "Login Google gagal");
       }
     } catch (e) {
-      print("❌ ERROR DI loginWithGoogle: $e");
       throw Exception("Gagal login dengan Google: $e");
     }
   }
@@ -71,11 +67,6 @@ class ApiService {
     final headers = await _authHeaders();
     final response = await http.get(url, headers: headers);
     final body = jsonDecode(response.body);
-    print("🧪 URL: $url");
-    print("🧪 Headers: $headers");
-    print("🧪 Response: ${response.statusCode}");
-    print("🧪 Body: ${response.body}");
-
     return body['data'];
   }
 
@@ -246,4 +237,44 @@ class ApiService {
       return [];
     }
   }
+
+  static Future<http.Response> simpanRiwayatBerat(double berat) async {
+    final url = Uri.parse("$baseUrl/api/riwayat-berat");
+    final headers = await _authHeaders();
+    return await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode({"berat": berat}),
+    );
+  }
+
+  static Future<http.Response> getArtikel({int page = 1, int limit = 5}) async {
+    final url = Uri.parse("$baseUrl/api/artikel?page=$page&limit=$limit");
+    final headers = await _authHeaders();
+    return await http.get(url, headers: headers);
+  }
+
+// --- Riwayat Login ---
+static Future<List<Map<String, dynamic>>> getRiwayatLogin() async {
+  final url = Uri.parse("$baseUrl/api/riwayat-login");
+  final headers = await _authHeaders();
+  final response = await http.get(url, headers: headers);
+
+  if (response.statusCode == 200) {
+    final body = jsonDecode(response.body);
+    return List<Map<String, dynamic>>.from(body['data']);
+  } else {
+    return [];
+  }
+}
+
+static Future<void> simpanRiwayatLogin() async {
+  final url = Uri.parse("$baseUrl/api/riwayat-login");
+  final headers = await _authHeaders();
+  final response = await http.post(url, headers: headers);
+
+  if (response.statusCode != 200) {
+    print("Gagal menyimpan riwayat login");
+  }
+}
 }

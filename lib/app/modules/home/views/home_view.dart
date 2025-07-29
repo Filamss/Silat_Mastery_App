@@ -61,9 +61,9 @@ class HomeView extends GetView<HomeController> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: const [
-                  _StatBox(title: "LATIHAN", value: "9"),
-                  _StatBox(title: "KKAL", value: "1038"),
-                  _StatBox(title: "MENIT", value: "54"),
+                  _StatBox(title: "LATIHAN", value: "0"),
+                  _StatBox(title: "KKAL", value: "0"),
+                  _StatBox(title: "MENIT", value: "0"),
                 ],
               ),
               AppSpasi.sedang,
