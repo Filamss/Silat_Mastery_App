@@ -7,6 +7,7 @@ import 'package:silat_mastery_app_2/app/widget/tema/app_gaya_teks.dart';
 import 'package:silat_mastery_app_2/app/widget/tema/app_spasi.dart';
 import 'package:silat_mastery_app_2/app/widget/tema/app_warna.dart';
 import 'package:silat_mastery_app_2/app/widget/komponen/navbar_bawah.dart';
+import 'package:silat_mastery_app_2/app/widget/jelajah/artikel_card.dart';
 
 class JelajahView extends GetView<JelajahController> {
   const JelajahView({super.key});
@@ -19,7 +20,6 @@ class JelajahView extends GetView<JelajahController> {
         currentIndex: 1,
         onTap: (index) {
           if (index == 1) return;
-
           switch (index) {
             case 0:
               Get.offAllNamed('/home');
@@ -33,22 +33,20 @@ class JelajahView extends GetView<JelajahController> {
           }
         },
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: Obx(
+        () => SingleChildScrollView(
           padding: AppSpasi.paddingLayar,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("Jelajah", style: AppGayaTeks.judul),
               AppSpasi.kecil,
-
-              // 🎯 Banner
               Container(
                 decoration: BoxDecoration(
                   color: AppWarna.utama,
                   borderRadius: BorderRadius.circular(16),
                   image: const DecorationImage(
-                    image: AssetImage('assets/banner_dada.png'),
+                    image: AssetImage('assets/img/Silat 3.png'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -61,33 +59,148 @@ class JelajahView extends GetView<JelajahController> {
                 ),
               ),
               AppSpasi.besar,
-
               const AnalisisStreamlitCard(),
-
-              // 🔘 Kategori
-              Text("Pilihan untuk anda", style: AppGayaTeks.subJudul),
+              AppSpasi.sedang,
+              Text("Artikel Untuk Anda", style: AppGayaTeks.subJudul),
               AppSpasi.kecil,
-              Column(
-                children: List.generate(3, (_) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: ItemLatihanCard(
-                      data: {
-                        'judul': 'Pemanasan Seluruh Tubuh',
-                        'durasi': 14,
-                        'jumlah_latihan': 5,
-                        'tingkat': 'Pemula',
-                        'gambar':
-                            '${controller.baseUrl}/upload/gambar/pemanasan.png',
-                      },
-                      onTap: () {},
+
+              if (controller.listArtikel.isEmpty)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text("Belum ada artikel."),
+                  ),
+                ),
+              ...controller.listArtikel.map(
+                (artikel) => ArtikelCard(data: artikel),
+              ),
+
+              AppSpasi.kecil,
+              Obx(() {
+                final currentPage = controller.currentPage.value;
+                final totalPages = controller.totalPages.value;
+
+                List<Widget> paginationButtons = [];
+
+                void addPageButton(int page) {
+                  final isSelected = page == currentPage;
+                  paginationButtons.add(
+                    ElevatedButton(
+                      onPressed: () => controller.goToPage(page),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isSelected ? AppWarna.utama : Colors.grey.shade200,
+                        foregroundColor:
+                            isSelected ? Colors.white : Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        minimumSize: const Size(36, 36),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                      ),
+                      child: Text("$page"),
                     ),
                   );
-                }),
-              ),
-              AppSpasi.sedang,
+                }
 
-              // 🎚️ Filter Kategori
+                // ← Prev
+                paginationButtons.add(
+                  ElevatedButton(
+                    onPressed:
+                        currentPage > 1
+                            ? () => controller.goToPage(currentPage - 1)
+                            : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          currentPage > 1
+                              ? AppWarna.utama
+                              : Colors.grey.shade300,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text("← Prev"),
+                  ),
+                );
+
+                if (totalPages <= 7) {
+                  for (int i = 1; i <= totalPages; i++) {
+                    addPageButton(i);
+                  }
+                } else {
+                  addPageButton(1);
+
+                  if (currentPage > 4) {
+                    paginationButtons.add(
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4),
+                        child: Text("..."),
+                      ),
+                    );
+                  }
+
+                  for (int i = currentPage - 1; i <= currentPage + 1; i++) {
+                    if (i > 1 && i < totalPages) {
+                      addPageButton(i);
+                    }
+                  }
+
+                  if (currentPage < totalPages - 3) {
+                    paginationButtons.add(
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4),
+                        child: Text("..."),
+                      ),
+                    );
+                  }
+
+                  addPageButton(totalPages);
+                }
+
+                // Next →
+                paginationButtons.add(
+                  ElevatedButton(
+                    onPressed:
+                        currentPage < totalPages
+                            ? () => controller.goToPage(currentPage + 1)
+                            : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          currentPage < totalPages
+                              ? AppWarna.utama
+                              : Colors.grey.shade300,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text("Next →"),
+                  ),
+                );
+
+                return Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: paginationButtons,
+                );
+              }),
+
+              AppSpasi.besar,
+              Text("Kategori Latihan", style: AppGayaTeks.subJudul),
+              AppSpasi.kecil,
               Obx(
                 () => Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -123,8 +236,6 @@ class JelajahView extends GetView<JelajahController> {
                 ),
               ),
               AppSpasi.sedang,
-
-              // 📦 Daftar Latihan
               Obx(
                 () => Column(
                   children:
@@ -141,6 +252,7 @@ class JelajahView extends GetView<JelajahController> {
                       }).toList(),
                 ),
               ),
+              const SizedBox(height: 32),
             ],
           ),
         ),
