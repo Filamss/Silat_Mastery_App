@@ -47,6 +47,38 @@ class LaporanView extends GetView<LaporanController> {
             const SizedBox(height: 24),
             RiwayatLatihan(),
             BeratBadanWidget(),
+            Obx(() {
+  final loginList = controller.riwayatLogin;
+
+  if (loginList.isEmpty) {
+    return const Text("Belum ada riwayat login.");
+  }
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const SizedBox(height: 24),
+      const Text(
+        "Riwayat Login",
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 8),
+      ...loginList.map((e) {
+        final waktu = DateTime.tryParse(e['waktu_login'] ?? '')?.toLocal();
+        final formatted = waktu != null
+            ? "${waktu.day}/${waktu.month}/${waktu.year} ${waktu.hour.toString().padLeft(2, '0')}:${waktu.minute.toString().padLeft(2, '0')}"
+            : "Format tidak valid";
+
+        return ListTile(
+          leading: const Icon(Icons.login),
+          title: Text("Login"),
+          subtitle: Text(formatted),
+        );
+      }).toList(),
+    ],
+  );
+})
+
           ],
         ),
       ),
